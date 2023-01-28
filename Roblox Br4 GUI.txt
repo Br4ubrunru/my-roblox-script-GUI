@@ -1,0 +1,589 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("BR4 GUI", "BloodTheme")
+
+--MAIN
+local Main = Window:NewTab("Main")
+local MainSection = Main:NewSection("Main")
+
+
+MainSection:NewButton("Fly/Fliying", "makes yo fly any where you want", function()
+repeat wait()
+
+until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:findFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
+
+local mouse = game.Players.LocalPlayer:GetMouse()
+
+repeat wait() until mouse
+
+local plr = game.Players.LocalPlayer
+
+local torso = plr.Character.Torso
+
+local flying = true
+
+local deb = true
+
+local ctrl = {f = 0, b = 0, l = 0, r = 0}
+
+local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+
+local maxspeed = 50
+
+local speed = 0
+
+ 
+
+function Fly()
+
+local bg = Instance.new("BodyGyro", torso)
+
+bg.P = 9e4
+
+bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+
+bg.cframe = torso.CFrame
+
+local bv = Instance.new("BodyVelocity", torso)
+
+bv.velocity = Vector3.new(0,0.1,0)
+
+bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+
+repeat wait()
+
+plr.Character.Humanoid.PlatformStand = true
+
+if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+
+speed = speed+.5+(speed/maxspeed)
+
+if speed > maxspeed then
+
+speed = maxspeed
+
+end
+
+elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+
+speed = speed-1
+
+if speed < 0 then
+
+speed = 0
+
+end
+
+end
+
+if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+
+bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+
+lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+
+elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+
+bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f+lastctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l+lastctrl.r,(lastctrl.f+lastctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+
+else
+
+bv.velocity = Vector3.new(0,0.1,0)
+
+end
+
+bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f+ctrl.b)*50*speed/maxspeed),0,0)
+
+until not flying
+
+ctrl = {f = 0, b = 0, l = 0, r = 0}
+
+lastctrl = {f = 0, b = 0, l = 0, r = 0}
+
+speed = 0
+
+bg:Destroy()
+
+bv:Destroy()
+
+plr.Character.Humanoid.PlatformStand = false
+
+end
+
+mouse.KeyDown:connect(function(key)
+
+if key:lower() == "e" then
+
+if flying then flying = false
+
+else
+
+flying = true
+
+Fly()
+
+end
+
+elseif key:lower() == "w" then
+
+ctrl.f = 1
+
+elseif key:lower() == "s" then
+
+ctrl.b = -1
+
+elseif key:lower() == "a" then
+
+ctrl.l = -1
+
+elseif key:lower() == "d" then
+
+ctrl.r = 1
+
+end
+
+end)
+
+mouse.KeyUp:connect(function(key)
+
+if key:lower() == "w" then
+
+ctrl.f = 0
+
+elseif key:lower() == "s" then
+
+ctrl.b = 0
+
+elseif key:lower() == "a" then
+
+ctrl.l = 0
+
+elseif key:lower() == "d" then
+
+ctrl.r = 0
+
+end
+
+end)
+
+Fly()
+
+
+end)
+
+MainSection:NewButton("btools", "Chaos", function()
+    backpack = game:GetService("Players").LocalPlayer.Backpack
+
+hammer = Instance.new("HopperBin")
+hammer.Name = "Hammer"
+hammer.BinType = 4
+hammer.Parent = backpack
+
+cloneTool = Instance.new("HopperBin")
+cloneTool.Name = "Clone"
+cloneTool.BinType = 3
+cloneTool.Parent = backpack
+
+grabTool = Instance.new("HopperBin")
+grabTool.Name = "Grab"
+grabTool.BinType = 2
+grabTool.Parent = backpack
+end)
+
+
+MainSection:NewButton("god mode", "is not working", function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/FwfNEqYz", true))()
+end)
+
+
+MainSection:NewButton("ESP", "see players stats", function()
+    local Player = game:GetService("Players").LocalPlayer
+local Camera = game:GetService("Workspace").CurrentCamera
+local Mouse = Player:GetMouse()
+ 
+local function Dist(pointA, pointB) -- magnitude errors for some reason : (
+return math.sqrt(math.pow(pointA.X - pointB.X, 2) + math.pow(pointA.Y - pointB.Y, 2))
+end
+ 
+local function GetClosest(points, dest)
+local min = math.huge
+local closest = nil
+for _,v in pairs(points) do
+local dist = Dist(v, dest)
+if dist < min then
+min = dist
+closest = v
+end
+end
+return closest
+end
+ 
+local function DrawESP(plr)
+local Box = Drawing.new("Quad")
+Box.Visible = false
+Box.PointA = Vector2.new(0, 0)
+Box.PointB = Vector2.new(0, 0)
+Box.PointC = Vector2.new(0, 0)
+Box.PointD = Vector2.new(0, 0)
+Box.Color = Color3.fromRGB(255, 255, 255)
+Box.Thickness = 2
+Box.Transparency = 1
+ 
+local function Update()
+local c
+c = game:GetService("RunService").RenderStepped:Connect(function()
+if plr.Character ~= nil and plr.Character:FindFirstChildOfClass("Humanoid") ~= nil and plr.Character:FindFirstChild("HumanoidRootPart") ~= nil and plr.Character:FindFirstChildOfClass("Humanoid").Health > 0 and plr.Character:FindFirstChild("Head") ~= nil then
+local pos, vis = Camera:WorldToViewportPoint(plr.Character.HumanoidRootPart.Position)
+if vis then
+local points = {}
+local c = 0
+for _,v in pairs(plr.Character:GetChildren()) do
+if v:IsA("BasePart") then
+c = c + 1
+local p = Camera:WorldToViewportPoint(v.Position)
+if v.Name == "HumanoidRootPart" then
+p = Camera:WorldToViewportPoint((v.CFrame * CFrame.new(0, 0, -v.Size.Z)).p)
+elseif v.Name == "Head" then
+p = Camera:WorldToViewportPoint((v.CFrame * CFrame.new(0, v.Size.Y/2, v.Size.Z/1.25)).p)
+elseif string.match(v.Name, "Left") then
+p = Camera:WorldToViewportPoint((v.CFrame * CFrame.new(-v.Size.X/2, 0, 0)).p)
+elseif string.match(v.Name, "Right") then
+p = Camera:WorldToViewportPoint((v.CFrame * CFrame.new(v.Size.X/2, 0, 0)).p)
+end
+points[c] = p
+end
+end
+local Left = GetClosest(points, Vector2.new(0, pos.Y))
+local Right = GetClosest(points, Vector2.new(Camera.ViewportSize.X, pos.Y))
+local Top = GetClosest(points, Vector2.new(pos.X, 0))
+local Bottom = GetClosest(points, Vector2.new(pos.X, Camera.ViewportSize.Y))
+ 
+if Left ~= nil and Right ~= nil and Top ~= nil and Bottom ~= nil then
+Box.PointA = Vector2.new(Right.X, Top.Y)
+Box.PointB = Vector2.new(Left.X, Top.Y)
+Box.PointC = Vector2.new(Left.X, Bottom.Y)
+Box.PointD = Vector2.new(Right.X, Bottom.Y)
+ 
+Box.Visible = true
+else
+Box.Visible = false
+end
+else
+Box.Visible = false
+end
+else
+Box.Visible = false
+if game.Players:FindFirstChild(plr.Name) == nil then
+c:Disconnect()
+end
+end
+end)
+end
+coroutine.wrap(Update)()
+end
+ 
+for _,v in pairs(game:GetService("Players"):GetChildren()) do
+if v.Name ~= Player.Name then
+DrawESP(v)
+end
+end
+ 
+game:GetService("Players").PlayerAdded:Connect(function(v)
+DrawESP(v)
+end)
+end)
+
+
+MainSection:NewButton("Chaos script", "join the game CHAOS in roblox  and press this button", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/1111-ssss/Chaos_Script/main/Chaos_script.txt'))()
+end)
+
+
+MainSection:NewButton("Admin", "free admin", function()
+    loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end)
+
+MainSection:NewButton("aimbot (right click to use the aim bot)", "aimbot", function()
+    loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/WRD%20Aimbot.txt"))()
+end)
+
+
+MainSection:NewButton("Noclip", "go inside walls", function()
+    local ScreenGui = Instance.new("ScreenGui")
+local mainframe = Instance.new("Frame")
+local Bossorlose13sGUI = Instance.new("TextLabel")
+local Noclip = Instance.new("TextButton")
+local Fly = Instance.new("TextButton")
+ 
+--Properties:
+ 
+ScreenGui.Parent = game.CoreGui
+ 
+mainframe.Name = "mainframe"
+mainframe.Parent = ScreenGui
+mainframe.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainframe.BorderColor3 = Color3.fromRGB(0, 0, 0)
+mainframe.Position = UDim2.new(0.135501355, 0, 0.306020081, 0)
+mainframe.Size = UDim2.new(0, 282, 0, 180)
+ 
+Bossorlose13sGUI.Name = "Bossorlose13's GUI"
+Bossorlose13sGUI.Parent = mainframe
+Bossorlose13sGUI.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Bossorlose13sGUI.Size = UDim2.new(0, 282, 0, 22)
+Bossorlose13sGUI.Font = Enum.Font.SourceSans
+Bossorlose13sGUI.Text = "Bossorlose13's GUI"
+Bossorlose13sGUI.TextColor3 = Color3.fromRGB(255, 0, 0)
+Bossorlose13sGUI.TextSize = 14.000
+ 
+Noclip.Name = "Noclip"
+Noclip.Parent = mainframe
+Noclip.BackgroundColor3 = Color3.fromRGB(85, 0, 255)
+Noclip.Position = UDim2.new(0.0283687934, 0, 0.294444442, 0)
+Noclip.Size = UDim2.new(0, 77, 0, 22)
+Noclip.Font = Enum.Font.SourceSans
+Noclip.Text = "Noclip"
+Noclip.TextColor3 = Color3.fromRGB(0, 0, 0)
+Noclip.TextSize = 14.000
+Noclip.MouseButton1Down:connect(function()
+local noclip = true char = game.Players.LocalPlayer.Character while true do if noclip == true then for _,v in pairs(char:children()) do pcall(function() if v.className == "Part" then v.CanCollide = false elseif v.ClassName == "Model" then v.Head.CanCollide = false end end) end end game:service("RunService").Stepped:wait() end
+end)
+Fly.Name = "Fly"
+Fly.Parent = mainframe
+Fly.BackgroundColor3 = Color3.fromRGB(85, 0, 255)
+Fly.Position = UDim2.new(0.723404229, 0, 0.305555552, 0)
+Fly.Size = UDim2.new(0, 48, 0, 20)
+Fly.Font = Enum.Font.SourceSans
+Fly.Text = "Fly"
+Fly.TextColor3 = Color3.fromRGB(0, 0, 0)
+Fly.TextSize = 14.000
+Fly.MouseButton1Down:connect(function()
+repeat wait()
+until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:findFirstChild("Torso") and game.Players.LocalPlayer.Character:findFirstChild("Humanoid")
+local mouse = game.Players.LocalPlayer:GetMouse()
+repeat wait() until mouse
+local plr = game.Players.LocalPlayer
+local torso = plr.Character.Torso
+local flying = true
+local deb = true
+local ctrl = {f = 0, b = 0, l = 0, r = 0}
+local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+local maxspeed = 50
+local speed = 0
+ 
+function Fly()
+local bg = Instance.new("BodyGyro", torso)
+bg.P = 9e4
+bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+bg.cframe = torso.CFrame
+local bv = Instance.new("BodyVelocity", torso)
+bv.velocity = Vector3.new(0,0.1,0)
+bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+repeat wait()
+plr.Character.Humanoid.PlatformStand = true
+if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+speed = speed+.5+(speed/maxspeed)
+if speed > maxspeed then
+speed = maxspeed
+end
+elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+speed = speed-1
+if speed < 0 then
+speed = 0
+end
+end
+if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f+lastctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l+lastctrl.r,(lastctrl.f+lastctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+else
+bv.velocity = Vector3.new(0,0.1,0)
+end
+bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f+ctrl.b)*50*speed/maxspeed),0,0)
+until not flying
+ctrl = {f = 0, b = 0, l = 0, r = 0}
+lastctrl = {f = 0, b = 0, l = 0, r = 0}
+speed = 0
+bg:Destroy()
+bv:Destroy()
+plr.Character.Humanoid.PlatformStand = false
+end
+mouse.KeyDown:connect(function(key)
+if key:lower() == "e" then
+if flying then flying = false
+else
+flying = true
+Fly()
+end
+elseif key:lower() == "w" then
+ctrl.f = 1
+elseif key:lower() == "s" then
+ctrl.b = -1
+elseif key:lower() == "a" then
+ctrl.l = -1
+elseif key:lower() == "d" then
+ctrl.r = 1
+end
+end)
+mouse.KeyUp:connect(function(key)
+if key:lower() == "w" then
+ctrl.f = 0
+elseif key:lower() == "s" then
+ctrl.b = 0
+elseif key:lower() == "a" then
+ctrl.l = 0
+elseif key:lower() == "d" then
+ctrl.r = 0
+end
+end)
+Fly()
+ 
+end)
+-- Scripts:
+ 
+local function JETILC_fake_script() -- mainframe.LocalScript
+local script = Instance.new('LocalScript', mainframe)
+ 
+script.parent.Selectable = true
+script.Parent.Active = true
+script.parent.Draggable = true
+ 
+end
+coroutine.wrap(JETILC_fake_script)()
+end)
+
+
+MainSection:NewButton("Speed GUI", "Become the flash", function()
+    wait(3)
+ 
+warn("loading Celerestial WalkSpeed GUI")
+ 
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Celerestial WalkSpeed GUI";
+    Text = "Loaded!";
+    Icon = "";
+    Duration = "2";
+})
+wait(2)
+ 
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Credit";
+    Text = "By : Celerestial#0608";
+    Icon = "";
+    Duration = "2";
+})
+-- Instances:
+ 
+local SpeedGUI = Instance.new("ScreenGui")
+local SpeedGUI_2 = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local SpeedValue = Instance.new("TextBox")
+local SetSpeed = Instance.new("TextButton")
+local ResetSpeed = Instance.new("TextButton")
+local Close = Instance.new("TextButton")
+ 
+--Properties:
+ 
+SpeedGUI.Name = "Speed GUI"
+SpeedGUI.Parent = game.CoreGui
+ 
+SpeedGUI_2.Name = "SpeedGUI"
+SpeedGUI_2.Parent = SpeedGUI
+SpeedGUI_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SpeedGUI_2.Position = UDim2.new(0.00799503271, 0, 0.883194327, 0)
+SpeedGUI_2.Size = UDim2.new(0, 241, 0, 70)
+ 
+TextLabel.Parent = SpeedGUI_2
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.Size = UDim2.new(0, 217, 0, 23)
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.Text = "Enter Speed:"
+TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.TextSize = 14.000
+ 
+SpeedValue.Name = "SpeedValue"
+SpeedValue.Parent = SpeedGUI_2
+SpeedValue.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+SpeedValue.Position = UDim2.new(0, 0, 0.326807767, 0)
+SpeedValue.Size = UDim2.new(0, 241, 0, 24)
+SpeedValue.Font = Enum.Font.SourceSans
+SpeedValue.Text = ""
+SpeedValue.TextColor3 = Color3.fromRGB(0, 0, 0)
+SpeedValue.TextSize = 14.000
+ 
+SetSpeed.Name = "SetSpeed"
+SetSpeed.Parent = SpeedGUI_2
+SetSpeed.BackgroundColor3 = Color3.fromRGB(85, 255, 0)
+SetSpeed.Position = UDim2.new(0.522821605, 0, 0.669664681, 0)
+SetSpeed.Size = UDim2.new(0, 115, 0, 23)
+SetSpeed.Font = Enum.Font.SourceSans
+SetSpeed.Text = "Set"
+SetSpeed.TextColor3 = Color3.fromRGB(0, 0, 0)
+SetSpeed.TextSize = 14.000
+ 
+ResetSpeed.Name = "ResetSpeed"
+ResetSpeed.Parent = SpeedGUI_2
+ResetSpeed.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+ResetSpeed.Position = UDim2.new(0, 0, 0.669664681, 0)
+ResetSpeed.Size = UDim2.new(0, 126, 0, 23)
+ResetSpeed.Font = Enum.Font.SourceSans
+ResetSpeed.Text = "Reset"
+ResetSpeed.TextColor3 = Color3.fromRGB(0, 0, 0)
+ResetSpeed.TextSize = 14.000
+ 
+Close.Name = "Close"
+Close.Parent = SpeedGUI_2
+Close.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+Close.Position = UDim2.new(0.900414944, 0, 0, 0)
+Close.Size = UDim2.new(0, 24, 0, 22)
+Close.Font = Enum.Font.SourceSans
+Close.Text = "X"
+Close.TextColor3 = Color3.fromRGB(0, 0, 0)
+Close.TextSize = 14.000
+ 
+--Scripts:
+ 
+Close.MouseButton1Down:connect(function()
+	SpeedGUI_2.Visible = false
+end)
+ 
+SetSpeed.MouseButton1Down:connect(function()
+	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = SpeedValue.Text
+	game.StarterGui:SetCore("SendNotification", {
+    Title = "WalkSpeedGui";
+    Text = "Speed has been set to".. SpeedValue.Text;
+    Icon = "";
+    Duration = "2";
+})
+end)
+ 
+ResetSpeed.MouseButton1Down:connect(function()
+	game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+	game.StarterGui:SetCore("SendNotification", {
+    Title = "WalkSpeedGui";
+    Text = "Your speed has been reset.";
+    Icon = "";
+    Duration = "2";
+})
+ 
+end)
+end)
+
+
+MainSection:NewButton("infjump", "jump on air", function()
+    local InfiniteJumpEnabled = true
+game:GetService("UserInputService").JumpRequest:connect(function()
+	if InfiniteJumpEnabled then
+		game:GetService"Players".LocalPlayer.Character:FindFirstChildOfClass'Humanoid':ChangeState("Jumping")
+	end
+end)
+local InfiniteJump = CreateButton("Infinite Jump: Off", StuffFrame)
+InfiniteJump.Position = UDim2.new(0,10,0,130)
+InfiniteJump.Size = UDim2.new(0,150,0,30)
+InfiniteJump.MouseButton1Click:connect(function()
+	local state = InfiniteJump.Text:sub(string.len("Infinite Jump: ") + 1) --too lazy to count lol
+	local new = state == "Off" and "On" or state == "On" and "Off"
+	InfiniteJumpEnabled = new == "On"
+	InfiniteJump.Text = "Infinite Jump: " .. new
+end)
+end)
